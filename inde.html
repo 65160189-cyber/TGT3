@@ -1257,6 +1257,11 @@
         </div>
     </nav>
 
+    <!-- Scroll to Top Button -->
+    <button onclick="scrollToTop()" id="scroll-to-top" class="fixed bottom-24 right-8 z-[9999] bg-primary hover:bg-blue-600 text-white p-4 rounded-full shadow-2xl transition-all duration-300 opacity-0 invisible scale-0 active:scale-95">
+        <i data-lucide="arrow-up" class="w-5 h-5"></i>
+    </button>
+
     <script>
         // Database Initialization
         const db = new Dexie('TGT3_Warehouse_MultiDispatch_V3');
@@ -1948,9 +1953,6 @@
             document.getElementById('inv-id').innerText = `BILL ID: TGT3-${h.id.toString().padStart(5, '0')}`;
             document.getElementById('inv-destination').innerText = h.destination || 'TGT3';
             document.getElementById('inv-customer').innerText = h.customer;
-            document.getElementById('inv-items-body').innerHTML = items.map(i => `
-                <tr><td class="py-3"><div class="font-black text-[12px] uppercase">${i.salePart}</div><div class="text-[9px] font-bold text-accent uppercase">KANBAN: ${i.kanbanId || '-'}</div></td><td class="py-3 font-bold text-[10px] text-slate-400 uppercase">${i.orderNo}</td><td class="py-3 text-right font-black text-sm">${i.qty}</td></tr>
-            `).join('');
             document.getElementById('inv-total-qty').innerText = items.reduce((sum, i) => sum + i.qty, 0);
             const qr = document.getElementById("qrcode"); qr.innerHTML = ""; new QRCode(qr, { text: `TGT3-VERIFY-${h.id}`, width: 64, height: 64 });
             document.getElementById('invoice-modal').classList.remove('hidden');
@@ -1958,7 +1960,29 @@
 
         // PDF & System Settings
         function downloadInvoicePDF() { html2pdf().set({ margin: 10, filename: 'TGT3_Delivery_Bill.pdf', jsPDF: { format: 'a4' } }).from(document.getElementById('invoice-print-area')).save(); }
-        
+
+        // Scroll to Top functionality
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Show/hide scroll to top button based on scroll position
+        function handleScroll() {
+            const scrollButton = document.getElementById('scroll-to-top');
+            if (scrollButton) {
+                if (window.pageYOffset > 300) {
+                    scrollButton.classList.remove('opacity-0', 'invisible', 'scale-0');
+                    scrollButton.classList.add('opacity-100', 'visible', 'scale-100');
+                } else {
+                    scrollButton.classList.add('opacity-0', 'invisible', 'scale-0');
+                    scrollButton.classList.remove('opacity-100', 'visible', 'scale-100');
+                }
+            }
+        }
+
         function showTab(tab) {
             ['dashboard', 'dispatch', 'stock', 'history', 'report'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
@@ -1985,6 +2009,9 @@
         document.getElementById('history-search').oninput = renderHistory;
         document.getElementById('barcode-input').oninput = updateDispatchList;
         
+        // Add scroll event listener
+        window.addEventListener('scroll', handleScroll);
+        
         window.onload = () => {
             if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
             document.getElementById('current-date-display').innerText = new Date().toLocaleDateString('en-GB', { dateStyle: 'full' });
@@ -1992,6 +2019,9 @@
             updateChartsData();
             updateClock(); 
             showTab('dashboard');
+            
+            // Initialize scroll button state
+            handleScroll();
         };
     </script>
 </body>
