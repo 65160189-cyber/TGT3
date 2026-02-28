@@ -1981,7 +1981,29 @@
             document.getElementById('inv-destination').innerText = h.destination || 'TGT3';
             document.getElementById('inv-customer').innerText = h.customer;
             document.getElementById('inv-total-qty').innerText = items.reduce((sum, i) => sum + i.qty, 0);
-            const qr = document.getElementById("qrcode"); qr.innerHTML = ""; new QRCode(qr, { text: `TGT3-VERIFY-${h.id}`, width: 64, height: 64 });
+            
+            // Generate QR Code with error handling
+            const qr = document.getElementById("qrcode");
+            if (qr && typeof QRCode !== 'undefined') {
+                qr.innerHTML = "";
+                try {
+                    new QRCode(qr, { 
+                        text: `TGT3-VERIFY-${h.id}`, 
+                        width: 64, 
+                        height: 64,
+                        correctLevel: QRCode.CorrectLevel.L
+                    });
+                } catch (error) {
+                    console.error('QR Code generation failed:', error);
+                    qr.innerHTML = '<div class="text-xs text-gray-500">QR Code Error</div>';
+                }
+            } else {
+                console.error('QRCode library not loaded');
+                if (qr) {
+                    qr.innerHTML = '<div class="text-xs text-gray-500">QR Code Unavailable</div>';
+                }
+            }
+            
             document.getElementById('invoice-modal').classList.remove('hidden');
         }
 
