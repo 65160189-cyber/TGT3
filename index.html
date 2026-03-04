@@ -1886,6 +1886,32 @@
             }, 300);
         }
 
+        function confirmPalletScan() {
+            const palletId = document.getElementById('pallet-qr-input').value.trim();
+            if (palletId.length < 3) {
+                showToast('กรุณาสแกน QR Code พาเลทให้ถูกต้อง');
+                return;
+            }
+            scannedPalletId = palletId;
+            closeModal('pallet-scanner-modal');
+            showToast('ยืนยัน QR Code พาเลทเรียบร้อย');
+        }
+
+        function validatePalletQR(qrCode) {
+            setTimeout(() => {
+                if (qrCode && qrCode.length >= 3) {
+                    document.getElementById('pallet-id-display').innerText = qrCode;
+                    document.getElementById('pallet-info').classList.remove('hidden');
+                    document.getElementById('confirm-pallet-btn').disabled = false;
+                    scannedPalletId = qrCode;
+                } else {
+                    document.getElementById('pallet-info').classList.add('hidden');
+                    document.getElementById('confirm-pallet-btn').disabled = true;
+                    scannedPalletId = '';
+                }
+            }, 300);
+        }
+
         function confirmShippingType() {
             if (selectedShippingType === 'pallet') {
                 const palletId = document.getElementById('pallet-qr-input-modal').value.trim();
