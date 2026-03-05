@@ -2294,13 +2294,17 @@
         function openConfirmModal() { document.getElementById('confirm-modal').classList.remove('hidden'); }
         async function clearOrdersOnly() { await db.orders.clear(); closeModal('confirm-modal'); showTab('dashboard'); showToast("ล้างรายการ Order แล้ว"); }
 
-        // Event Listeners
-        document.getElementById('stock-search').oninput = updateStockTable;
-        document.getElementById('history-search').oninput = renderHistory;
-        document.getElementById('barcode-input').oninput = updateDispatchList;
-        
-        // Pallet QR Scanner Event Listeners
+        // Event Listeners - Move to DOMContentLoaded to avoid errors
         document.addEventListener('DOMContentLoaded', function() {
+            // Set up event listeners only when DOM is ready
+            const stockSearch = document.getElementById('stock-search');
+            const historySearch = document.getElementById('history-search');
+            const barcodeInput = document.getElementById('barcode-input');
+            
+            if(stockSearch) stockSearch.oninput = updateStockTable;
+            if(historySearch) historySearch.oninput = renderHistory;
+            if(barcodeInput) barcodeInput.oninput = updateDispatchList;
+            
             const palletInput = document.getElementById('pallet-qr-input');
             const palletModalInput = document.getElementById('pallet-qr-input-modal');
             
