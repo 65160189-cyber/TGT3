@@ -2348,15 +2348,22 @@
         window.addEventListener('scroll', handleScroll);
         
         window.onload = () => {
-            if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
-            document.getElementById('current-date-display').innerText = new Date().toLocaleDateString('en-GB', { dateStyle: 'full' });
-            initDashboardCharts();
-            updateChartsData();
-            updateClock(); 
-            showTab('dashboard');
-            
-            // Initialize scroll button state
-            handleScroll();
+            try {
+                if(localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+                const dateDisplay = document.getElementById('current-date-display');
+                if(dateDisplay) dateDisplay.innerText = new Date().toLocaleDateString('en-GB', { dateStyle: 'full' });
+                
+                // Initialize functions with error handling
+                if(typeof initDashboardCharts === 'function') initDashboardCharts();
+                if(typeof updateChartsData === 'function') updateChartsData();
+                if(typeof updateClock === 'function') updateClock(); 
+                if(typeof showTab === 'function') showTab('dashboard');
+                
+                // Initialize scroll button state
+                if(typeof handleScroll === 'function') handleScroll();
+            } catch (error) {
+                console.error('Error during initialization:', error);
+            }
         };
     </script>
 </body>
