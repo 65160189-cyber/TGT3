@@ -2042,7 +2042,27 @@
         async function updateDispatchList() {
             const search = document.getElementById('barcode-input').value.toUpperCase();
             let list = await db.orders.where('qty').above(0).toArray();
-            if(search) list = list.filter(o => o.customer.toUpperCase().includes(search) || o.salePart.toUpperCase().includes(search) || o.orderNo.toUpperCase().includes(search) || (o.kanbanId && o.kanbanId.toUpperCase().includes(search)));
+            
+            if(search) {
+                // Check if search contains QR Code format (pipe-separated)
+                if(search.includes('|')) {
+                    // Extract KanbanID from QR Code format: TMTB|TMB|T8917601|53100-0A010|S07Q|1|*|29/01/2026|99||1|5
+                    // KanbanID is at position 5 (index 4)
+                    const qrParts = search.split('|');
+                    const kanbanIdFromQR = qrParts.length >= 5 ? qrParts[4] : '';
+                    
+                    if(kanbanIdFromQR) {
+                        // Search by extracted KanbanID
+                        list = list.filter(o => o.kanbanId && o.kanbanId.toUpperCase() === kanbanIdFromQR.toUpperCase());
+                    } else {
+                        // If no valid KanbanID found, return empty list
+                        list = [];
+                    }
+                } else {
+                    // Normal search by customer, part, order, or kanban
+                    list = list.filter(o => o.customer.toUpperCase().includes(search) || o.salePart.toUpperCase().includes(search) || o.orderNo.toUpperCase().includes(search) || (o.kanbanId && o.kanbanId.toUpperCase().includes(search)));
+                }
+            }
             
             const container = document.getElementById('dispatch-list-container');
             container.innerHTML = list.length === 0 ? `<div class="py-20 text-center opacity-20 text-xs font-bold uppercase italic">ไม่มีรายการที่รอดำเนินการ</div>` : `
