@@ -2036,6 +2036,18 @@
             } finally {
                 toggleLoading(false);
             }
+        }
+
+        // Data Management
+        async function updateDispatchList() {
+            const search = document.getElementById('barcode-input').value.toUpperCase();
+            let list = await db.orders.where('qty').above(0).toArray();
+            if(search) list = list.filter(o => o.customer.toUpperCase().includes(search) || o.salePart.toUpperCase().includes(search) || o.orderNo.toUpperCase().includes(search) || (o.kanbanId && o.kanbanId.toUpperCase().includes(search)));
+            
+            const container = document.getElementById('dispatch-list-container');
+            container.innerHTML = list.length === 0 ? `<div class="py-20 text-center opacity-20 text-xs font-bold uppercase italic">ไม่มีรายการที่รอดำเนินการ</div>` : `
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+                    <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-50 dark:bg-slate-800/50 font-black text-slate-400 uppercase tracking-tighter">
                                 <tr>
@@ -2090,7 +2102,9 @@
             lucide.createIcons();
         }
 
-        // ... (rest of the code remains the same)
+        // Excel Import
+        document.getElementById('excel-input').onchange = async (e) => {
+            const file = e.target.files[0];
             if (!file) return;
             toggleLoading(true, "กำลังตรวจสอบข้อมูล...");
             const reader = new FileReader();
